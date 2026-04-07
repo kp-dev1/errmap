@@ -8,9 +8,9 @@ A tree-style Python error formatter that replaces the default traceback printer 
  └── main_loop (line 12)
       > game_update()
  │    └── game_update (line 9)
-      > physics_calc()
+           > physics_calc()
  │    │    └── physics_calc (line 6)
-      > return 1 / 0
+               > return 1 / 0
 
 ZeroDivisionError: division by zero
 ```
