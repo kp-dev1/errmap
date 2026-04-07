@@ -1,0 +1,86 @@
+Metadata-Version: 2.4
+Name: errmap
+Version: 1.0.0
+Summary: A tree-style Python error formatter that replaces the default traceback printer.
+License: MIT
+Project-URL: Homepage, https://github.com/kp-dev1/errmap
+Project-URL: Repository, https://github.com/kp-dev1/errmap
+Project-URL: Issues, https://github.com/kp-dev1/errmap/issues
+Keywords: error,traceback,debugging,formatter,utility
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Debuggers
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# ErrMap
+
+A tree-style Python error formatter that replaces the default traceback printer with a clean, colour-coded call tree.
+
+```
+[ERR-MAP] Traceback detected
+ root
+ └── main_loop (line 12)
+      > game_update()
+ │    └── game_update (line 9)
+      > physics_calc()
+ │    │    └── physics_calc (line 6)
+      > return 1 / 0
+
+ZeroDivisionError: division by zero
+```
+
+---
+
+## Install
+
+```bash
+pip install errmap
+```
+
+---
+
+## Usage
+
+```python
+from errmap import ErrMap
+
+errmap = ErrMap()
+errmap.install()
+```
+
+That's it. From that point on any unhandled exception will print as a tree instead of the default traceback.
+
+---
+
+## API
+
+### `ErrMap()`
+Creates a new ErrMap instance.
+
+### `errmap.install()`
+Replaces `sys.excepthook` with the tree formatter.
+
+### `errmap.active`
+Set to `False` to temporarily disable ErrMap and fall back to the default traceback printer.
+
+```python
+errmap.active = False  # default traceback
+errmap.active = True   # tree formatter
+```
+
+---
+
+## License
+
+MIT

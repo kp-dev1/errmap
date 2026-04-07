@@ -1,0 +1,10 @@
+LICENSE
+README.md
+pyproject.toml
+errmap/__init__.py
+errmap/errmap.py
+errmap.egg-info/PKG-INFO
+errmap.egg-info/SOURCES.txt
+errmap.egg-info/dependency_links.txt
+errmap.egg-info/top_level.txt
+tests/test_errmap.py
