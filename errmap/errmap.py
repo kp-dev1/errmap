@@ -1,14 +1,36 @@
 import sys
 import traceback
+import json
 
 class ErrMap:
-    __slots__ = ["branch", "vertical", "active"]
+    __slots__ = ["branch", "vertical", "active", "_errors"]
     def __init__(self):
         self.branch = " └── "
         self.vertical = " │   "
         self.active = True
+        self._errors = []
+
+    def _build_json_data(self, etype, value, tb):
+        """Convert error to JSON-serializable dict"""
+        frames = traceback.extract_tb(tb)
+        
+        call_tree = []
+        for i, frame in enumerate(frames):
+            call_tree.append({
+                "name": frame.name,
+                "line": frame.lineno,
+                "code": frame.line.strip() if frame.line else "",
+                "is_error_frame": (i == len(frames) - 1)
+            })
+        
+        return {
+            "error_type": etype.__name__,
+            "error_message": str(value),
+            "call_tree": call_tree
+        }
 
     def _draw_tree(self, etype, value, tb):
+        self._errors.append(self._build_json_data(etype, value, tb))
         frames = traceback.extract_tb(tb)
         totalframes = len(frames)
         
@@ -36,3 +58,12 @@ class ErrMap:
                 sys.__excepthook__(etype, value, tb)
         
         sys.excepthook = hook
+
+    def save_to_json(self, filepath):
+        """Save all captured errors to a JSON file"""
+        if not self._errors:
+            print("[ERR-MAP] No errors to save. Has an exception occurred?")
+            return
+        
+        with open(filepath, 'w') as f:
+            json.dump(self._errors, f, indent=2, default=str)

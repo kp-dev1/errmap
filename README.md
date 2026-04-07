@@ -41,18 +41,32 @@ That's it. From that point on any unhandled exception will print as a tree inste
 ## API
 
 ### `ErrMap()`
+
 Creates a new ErrMap instance.
 
 ### `errmap.install()`
+
 Replaces `sys.excepthook` with the tree formatter.
 
 ### `errmap.active`
+
 Set to `False` to temporarily disable ErrMap and fall back to the default traceback printer.
 
 ```python
 errmap.active = False  # default traceback
 errmap.active = True   # tree formatter
 ```
+
+### Save to JSON
+
+```python
+
+
+# Save the error to a JSON file
+errmap.save_to_json("error.json")
+```
+
+The JSON file contains the error type, message, and complete call tree.
 
 ---
 
