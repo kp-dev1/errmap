@@ -11,13 +11,12 @@ class ErrMap:
         self._errors = []
         self._filepath = filepath
 
-    def _build_json_data(self, etype, value, tb):
-        """Convert error to JSON-serializable dict"""
-        frames = traceback.extract_tb(tb)
-
+    def _build_json_data(self, etype, value, frames):
+        """Convert error to JSON-serializable dict. Frames are pre-extracted by caller."""
         call_tree = []
         for i, frame in enumerate(frames):
             call_tree.append({
+                "filename": frame.filename,
                 "name": frame.name,
                 "line": frame.lineno,
                 "code": frame.line.strip() if frame.line else "",
@@ -31,12 +30,11 @@ class ErrMap:
         }
 
     def _draw_tree(self, etype, value, tb):
-        self._errors.append(self._build_json_data(etype, value, tb))
-        
+        frames = traceback.extract_tb(tb)
+        self._errors.append(self._build_json_data(etype, value, frames))
+
         if self._filepath:
             self._auto_save()
-        
-        frames = traceback.extract_tb(tb)
         totalframes = len(frames)
         
         print("\n\033[91m[ERR-MAP] Traceback detected\033[0m")
