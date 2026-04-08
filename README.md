@@ -57,16 +57,19 @@ errmap.active = False  # default traceback
 errmap.active = True   # tree formatter
 ```
 
-### Save to JSON
+### Auto-save to JSON
+
+Every traceback is automatically saved to `errmap_errors.json` — no user interaction required.
 
 ```python
+from errmap import ErrMap
 
+ErrMap().install()
 
-# Save the error to a JSON file
-errmap.save_to_json("error.json")
+# Any exception that occurs will auto-save to errmap_errors.json
 ```
 
-The JSON file contains the error type, message, and complete call tree.
+The JSON file contains the error type, message, and complete call tree for every traceback.
 
 ---
 

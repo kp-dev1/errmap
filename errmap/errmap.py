@@ -3,13 +3,12 @@ import traceback
 import json
 
 class ErrMap:
-    __slots__ = ["branch", "vertical", "active", "_errors", "_filepath"]
-    def __init__(self, filepath=None):
+    __slots__ = ["branch", "vertical", "active", "_errors"]
+    def __init__(self):
         self.branch = " └── "
         self.vertical = " │   "
         self.active = True
         self._errors = []
-        self._filepath = filepath
 
     def _build_json_data(self, etype, value, frames):
         """Convert error to JSON-serializable dict. Frames are pre-extracted by caller."""
@@ -33,8 +32,7 @@ class ErrMap:
         frames = traceback.extract_tb(tb)
         self._errors.append(self._build_json_data(etype, value, frames))
 
-        if self._filepath:
-            self._auto_save()
+        self._save_to_json()
         totalframes = len(frames)
         
         print("\n\033[91m[ERR-MAP] Traceback detected\033[0m")
@@ -52,11 +50,9 @@ class ErrMap:
 
         print(f"\n\033[91m{etype.__name__}: {value}\033[0m\n")
 
-    def _auto_save(self):
-        """Auto-save errors to the configured filepath"""
-        if self._filepath:
-            with open(self._filepath, 'w') as f:
-                json.dump(self._errors, f, indent=2, default=str)
+    def _save_to_json(self):
+        with open("errmap_errors.json", "w", encoding="utf-8") as f:
+            json.dump(self._errors, f, indent=2, default=str)
 
     def install(self):
         """ Replaces the default Python error printer with yours """
@@ -67,12 +63,3 @@ class ErrMap:
                 sys.__excepthook__(etype, value, tb)
         
         sys.excepthook = hook
-
-    def save_to_json(self, filepath):
-        """Save all captured errors to a JSON file"""
-        if not self._errors:
-            print("[ERR-MAP] No errors to save. Has an exception occurred?")
-            return
-        
-        with open(filepath, 'w') as f:
-            json.dump(self._errors, f, indent=2, default=str)
