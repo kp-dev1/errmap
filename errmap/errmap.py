@@ -1,15 +1,38 @@
 import sys
 import traceback
+import json
 
 class ErrMap:
-    __slots__ = ["branch", "vertical", "active"]
+    __slots__ = ["branch", "vertical", "active", "_errors"]
     def __init__(self):
         self.branch = " └── "
         self.vertical = " │   "
         self.active = True
+        self._errors = []
+
+    def _build_json_data(self, etype, value, frames):
+        """Convert error to JSON-serializable dict. Frames are pre-extracted by caller."""
+        call_tree = []
+        for i, frame in enumerate(frames):
+            call_tree.append({
+                "filename": frame.filename,
+                "name": frame.name,
+                "line": frame.lineno,
+                "code": frame.line.strip() if frame.line else "",
+                "is_error_frame": (i == len(frames) - 1)
+            })
+
+        return {
+            "error_type": etype.__name__,
+            "error_message": str(value),
+            "call_tree": call_tree
+        }
 
     def _draw_tree(self, etype, value, tb):
         frames = traceback.extract_tb(tb)
+        self._errors.append(self._build_json_data(etype, value, frames))
+
+        self._save_to_json()
         totalframes = len(frames)
         
         print("\n\033[91m[ERR-MAP] Traceback detected\033[0m")
@@ -26,6 +49,10 @@ class ErrMap:
                 print(f"{indent}     \033[90m> {frame.line}\033[0m")
 
         print(f"\n\033[91m{etype.__name__}: {value}\033[0m\n")
+
+    def _save_to_json(self):
+        with open("errmap_errors.json", "w", encoding="utf-8") as f:
+            json.dump(self._errors, f, indent=2, default=str)
 
     def install(self):
         """ Replaces the default Python error printer with yours """
